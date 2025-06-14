@@ -1,6 +1,6 @@
 # TodoListApp
 
-https://github.com/user-attachments/assets/c904dee6-23de-4ac2-877b-1dda80cfe0d8
+[https://github.com/user-attachments/assets/c904dee6-23de-4ac2-877b-1dda80cfe0d8](https://streamable.com/p1qdch)
 
 TodoListApp adalah aplikasi manajemen tugas (to-do list) yang terdiri dari dua bagian utama:
 - **Frontend:** Aplikasi Flutter (`taskflut`)
