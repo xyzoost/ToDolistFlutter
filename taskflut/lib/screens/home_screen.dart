@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadTasks() async {
     if (!mounted) return;
     setState(() => _isLoading = true);
-    
+
     try {
       final tasks = await ApiService.getTasks();
       if (!mounted) return;
@@ -131,7 +131,9 @@ class _HomeScreenState extends State<HomeScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.red[400],
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 3),
       ),
     );
@@ -139,82 +141,130 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: CustomAppBar(
-        title: 'TaskFlut',
+        title: 'Task Manager',
+        backgroundColor: colorScheme.primary,
+        titleColor: Colors.white,
         actions: [
           _isProcessing
               ? const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(color: Colors.white),
+                  padding: EdgeInsets.all(12.0),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  ),
                 )
               : IconButton(
-                  icon: const Icon(Icons.logout),
+                  icon: const Icon(Icons.logout, color: Colors.white),
                   onPressed: _logout,
                 ),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _tasks.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'No tasks yet. Add one!',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadTasks,
-                        child: const Text('Refresh'),
-                      ),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loading your tasks...',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: Colors.grey[600],
+                    ),
                   ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadTasks,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _tasks.length,
-                    itemBuilder: (context, index) {
-                      final task = _tasks[index];
-                      return TaskItem(
-                        key: ValueKey(task.id), // Important for animations
-                        task: task,
-                        onTap: () async {
-                          final result = await Navigator.push<Task>(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => TaskDetailScreen(task: task),
-                            ),
-                          );
-                          if (result != null) await _updateTask(result);
-                        },
-                        onDelete: () => _showDeleteDialog(task.id),
-                        onToggle: (value) => _toggleTaskStatus(task.id, value),
-                      );
-                    },
-                  ),
-                ),
-      floatingActionButton: _isProcessing
-          ? FloatingActionButton(
-              onPressed: null,
-              backgroundColor: Colors.red[300],
-              child: const CircularProgressIndicator(color: Colors.white),
+                ],
+              ),
             )
-          : FloatingActionButton(
-              backgroundColor: Colors.red,
-              child: const Icon(Icons.add, color: Colors.white),
-              onPressed: () async {
+          : _tasks.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.task_outlined, size: 64, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No tasks yet',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Tap the + button to add your first task',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: colorScheme.primary,
+                      side: BorderSide(color: colorScheme.primary),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                    ),
+                    onPressed: _loadTasks,
+                    child: const Text('Refresh'),
+                  ),
+                ],
+              ),
+            )
+          : RefreshIndicator(
+              color: colorScheme.primary,
+              onRefresh: _loadTasks,
+              child: ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: _tasks.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
+                itemBuilder: (context, index) {
+                  final task = _tasks[index];
+                  return TaskItem(
+                    key: ValueKey(task.id),
+                    task: task,
+                    onTap: () async {
+                      final result = await Navigator.push<Task>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => TaskDetailScreen(task: task),
+                        ),
+                      );
+                      if (result != null) await _updateTask(result);
+                    },
+                    onDelete: () => _showDeleteDialog(task.id),
+                    onToggle: (value) => _toggleTaskStatus(task.id, value),
+                  );
+                },
+              ),
+            ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: colorScheme.primary,
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: _isProcessing
+            ? const CircularProgressIndicator(color: Colors.white)
+            : const Icon(Icons.add, color: Colors.white),
+        onPressed: _isProcessing
+            ? null
+            : () async {
                 final result = await Navigator.push<Task>(
                   context,
                   MaterialPageRoute(builder: (_) => const AddTaskScreen()),
                 );
                 if (result != null) await _addTask(result);
               },
-            ),
+      ),
     );
   }
 
@@ -223,18 +273,17 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Task'),
-        content: const Text('Are you sure you want to delete this task?'),
+        content: const Text('This action cannot be undone.'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
           ),
         ],
       ),

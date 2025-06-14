@@ -6,7 +6,6 @@ import 'package:taskflut/widgets/custom_text_field.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   final Task task;
-
   const TaskDetailScreen({super.key, required this.task});
 
   @override
@@ -14,8 +13,10 @@ class TaskDetailScreen extends StatefulWidget {
 }
 
 class _TaskDetailScreenState extends State<TaskDetailScreen> {
-  late final _titleController = TextEditingController(text: widget.task.title);
-  late final _descriptionController =
+  late final TextEditingController _titleController = TextEditingController(
+    text: widget.task.title,
+  );
+  late final TextEditingController _descriptionController =
       TextEditingController(text: widget.task.description ?? '');
 
   @override
@@ -29,27 +30,19 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           children: [
             Text(
               'Title',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[700],
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
             ),
             const SizedBox(height: 5),
             Text(
               widget.task.title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            if (widget.task.description != null) ...[
+            if (widget.task.description != null &&
+                widget.task.description!.isNotEmpty) ...[
               Text(
                 'Description',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[700],
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
               ),
               const SizedBox(height: 5),
               Text(
@@ -62,10 +55,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               children: [
                 Text(
                   'Status: ',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[700],
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                 ),
                 Text(
                   widget.task.isCompleted ? 'Completed' : 'Pending',
@@ -97,10 +87,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CustomTextField(
-                label: 'Title',
-                controller: _titleController,
-              ),
+              CustomTextField(label: 'Title', controller: _titleController),
               const SizedBox(height: 20),
               CustomTextField(
                 label: 'Description',

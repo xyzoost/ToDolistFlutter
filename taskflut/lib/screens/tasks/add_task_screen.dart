@@ -84,7 +84,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
       // Panggil API service untuk create task di sini
       // await ApiService.createTask(newTask);
-      
+
       if (!mounted) return;
       Navigator.pop(context, newTask);
     } catch (e) {
@@ -105,10 +105,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add New Task'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Add New Task'), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -116,7 +113,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title Field
               CustomTextField(
                 controller: _titleController,
                 label: 'Task Title *',
@@ -128,16 +124,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 },
               ),
               const SizedBox(height: 20),
-
-              // Description Field
               CustomTextField(
                 controller: _descriptionController,
                 label: 'Description',
                 maxLines: 3,
               ),
               const SizedBox(height: 20),
-
-              // Due Date Picker
               InkWell(
                 onTap: () => _selectDate(context),
                 child: InputDecorator(
@@ -161,8 +153,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Priority Selector
               InkWell(
                 onTap: _showPriorityDialog,
                 child: InputDecorator(
@@ -186,8 +176,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-
-              // Submit Button
               CustomButton(
                 text: 'Create Task',
                 onPressed: _submitTask,

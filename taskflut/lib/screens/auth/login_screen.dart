@@ -20,46 +20,45 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
- Future<void> _login() async {
-  if (!_formKey.currentState!.validate()) return;
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
 
-  setState(() => _isLoading = true);
-  try {
-    final authService = Provider.of<AuthService>(context, listen: false);
-    await authService.login(
-      _emailController.text.trim(),
-      _passwordController.text.trim(),
-    );
+    setState(() => _isLoading = true);
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      await authService.login(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
 
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
-  } catch (e) {
-    String errorMessage = 'An error occurred';
-    if (e.toString().contains('Failed to connect')) {
-      errorMessage = 'Failed to connect to server. Check your internet connection.';
-    } else if (e.toString().contains('Login failed')) {
-      errorMessage = 'Invalid email or password';
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    } catch (e) {
+      String errorMessage = 'An error occurred';
+      if (e.toString().contains('Failed to connect')) {
+        errorMessage =
+            'Failed to connect to server. Check your internet connection.';
+      } else if (e.toString().contains('Login failed')) {
+        errorMessage = 'Invalid email or password';
+      }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(errorMessage),
-        backgroundColor: Colors.red,
-      ),
-    );
-  } finally {
-    setState(() => _isLoading = false);
   }
-}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Login'),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
@@ -106,9 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const RegisterScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
                   );
                 },
                 child: const Text(
